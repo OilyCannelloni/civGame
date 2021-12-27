@@ -1,5 +1,8 @@
 package gui;
 
+import civ.MapField;
+import civ.MapPosition;
+import civ.Terrain;
 import civ.Vector2D;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -22,7 +25,13 @@ public class App extends Application {
         canvasVBox.getChildren().add(this.canvas);
 
         this.canvas.init();
-        this.canvas.render(new Vector2D(5, 30));
+        this.canvas.render(new Vector2D(0, 0));
+
+        MapField field = new MapField(new MapPosition(3, 5), Terrain.PLAINS);
+        this.canvas.drawField(field);
+
+
+
 
         primaryStage.setScene(scene);
         primaryStage.show();

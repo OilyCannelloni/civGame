@@ -1,5 +1,7 @@
 package gui;
 
+import civ.MapField;
+import civ.MapPosition;
 import civ.Rect2D;
 import civ.Vector2D;
 import javafx.scene.canvas.Canvas;
@@ -38,6 +40,19 @@ public class GridCanvas extends Canvas {
         ctx = this.getGraphicsContext2D();
         this.setOnKeyPressed(this::onKeyPressed);
     }
+
+    public void drawIcon(CanvasIcon icon, Vector2D position) {
+        Vector2D finalXY = position.add(icon.getOffset());
+        this.ctx.drawImage(icon, finalXY.x, finalXY.y);
+    }
+
+    public void drawField(MapField field) {
+        MapPosition mapPosition = field.getPosition();
+        Vector2D gridFieldOrigin = this.positionToGridXY(mapPosition, this.origin);
+        assert field.getTerrain().getIcon() != null;
+        this.drawIcon(field.getTerrain().getIcon(), gridFieldOrigin);
+    }
+
 
     private void onKeyPressed(KeyEvent keyEvent) {
         System.out.println(keyEvent.getCode());
@@ -82,6 +97,18 @@ public class GridCanvas extends Canvas {
                 renderBaseXY.x % (3*r),
                 renderBaseXY.y % (r * sqrt3)
         ).opposite();
+    }
+
+    public Vector2D positionToGridXY(MapPosition position, Vector2D renderBaseXY) {
+        Vector2D absolute = this.toAbsoluteGridXY(position);
+        return absolute.subtract(renderBaseXY);
+    }
+
+    private Vector2D toAbsoluteGridXY(MapPosition position) {
+        return new Vector2D(
+                ((double) position.x) * 3 / 2 * r,
+                position.x % 2 == 0 ? position.y * r * sqrt3 : position.y * r * sqrt3 + r * sqrt3 / 2
+        );
     }
     
     public void drawGridLines(Vector2D offset) {
