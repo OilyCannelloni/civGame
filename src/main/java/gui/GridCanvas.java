@@ -76,7 +76,6 @@ public class GridCanvas extends Canvas {
     }
 
     private void onKeyPressed(KeyEvent keyEvent) {
-        System.out.println(keyEvent.getCode());
         Vector2D delta;
         switch (keyEvent.getCode()) {
             case DOWN:
@@ -189,7 +188,7 @@ public class GridCanvas extends Canvas {
                 strip.point(MapDirection.RIGHT_DOWN)
         };
         for (MapPosition hex : CHECKED_HEXES) {
-            if (this.gridXYInHex(gridXY, hex)) return hex;
+            if (this.gridXYInHex(absolute, hex)) return hex;
         }
         return new MapPosition(0, 0);
     }
