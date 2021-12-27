@@ -123,7 +123,7 @@ public class GridCanvas extends Canvas {
                 position,
                 2,
                 Color.PINK,
-                Color.color(1, 0xc0, 0xcb, 0.2)
+                Color.color(1, 0, 0, 0.2)
         );
 
         // fields

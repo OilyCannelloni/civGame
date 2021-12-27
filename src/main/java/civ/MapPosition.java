@@ -1,5 +1,6 @@
 package civ;
 
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
 
@@ -54,6 +55,14 @@ public class MapPosition {
 
     public MapPosition point(MapDirection dir) {
         return this.add(dir.delta(this));
+    }
+
+    public LinkedList<MapPosition> adjacent() {
+        LinkedList<MapPosition> adjacent = new LinkedList<>();
+        for (MapDirection dir : MapDirection.values()) {
+            adjacent.add(this.point(dir));
+        }
+        return adjacent;
     }
 
     public MapPosition opposite(){

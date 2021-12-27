@@ -12,12 +12,14 @@ public class Programmer extends Unit {
         return ICON;
     }
 
-    public Programmer() {
-        super(100, 30, 3);
+    public Programmer(WorldMap map) {
+        super(map,100, 30, 3);
     }
 
     @Override
     public boolean canMoveTo(MapPosition position) {
-        return true;
+        if (!super.canMoveTo(position)) return false;
+        MapField field = this.map.getField(position);
+        return field.getTerrain() != Terrain.MOUNTAINS;
     }
 }

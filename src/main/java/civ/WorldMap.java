@@ -2,11 +2,12 @@ package civ;
 
 import java.util.LinkedList;
 
-public class WorldMap implements IWorldMap {
+public class WorldMap {
     private int width, height;
-    private IMapField[][] fields;
+    private MapField[][] fields;
     private LinkedList<MapPosition> highlightedPositions;
     private MapPosition selectedPosition;
+    private MapRect boundingBox;
 
     public WorldMap(int width, int height) {
         this.width = width;
@@ -14,6 +15,11 @@ public class WorldMap implements IWorldMap {
         this.fields = new MapField[width][height];
         this.selectedPosition = null;
         this.highlightedPositions = new LinkedList<>();
+        this.boundingBox = new MapRect(0, 0, width - 1, height - 1);
+    }
+
+    public boolean isWithinBounds(MapPosition position) {
+        return this.boundingBox.contains(position);
     }
 
     public LinkedList<MapPosition> getHighlightedPositions() {
@@ -36,8 +42,7 @@ public class WorldMap implements IWorldMap {
         return new MapPosition(this.width, this.height);
     }
 
-    @Override
-    public void placeField(MapPosition position, IMapField field) {
+    public void placeField(MapPosition position, MapField field) {
         this.fields[position.x][position.y] = field;
     }
 
@@ -45,18 +50,21 @@ public class WorldMap implements IWorldMap {
         this.fields[position.x][position.y].setUnit(unit);
     }
 
-    @Override
-    public IMapField getField(MapPosition position) {
+    public MapField getField(MapPosition position) {
         return this.fields[position.x][position.y];
     }
 
-    @Override
     public LinkedList<MapPosition> getPossibleMoves(MapPosition position) {
         return null;
     }
 
     public void fieldLeftClicked(MapPosition position) {
         this.selectedPosition = position;
+        this.highlightedPositions.clear();
+
+        Unit unit = this.getField(position).getUnit();
+        if (unit != null)
+            this.highlightedPositions.addAll(unit.getPossibleMoves(position).keySet());
     }
 
     public void fieldRightClicked(MapPosition position) {
@@ -64,7 +72,7 @@ public class WorldMap implements IWorldMap {
         if (selectedUnit != null) {
             if (selectedUnit.canMoveTo(position)) {
                 this.move(selectedPosition, position);
-                this.selectedPosition = position;
+                this.fieldLeftClicked(position);
             }
         }
     }

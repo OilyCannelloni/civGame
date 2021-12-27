@@ -31,7 +31,7 @@ public enum MapDirection {
                 case RIGHT_UP:
                     return new MapPosition(1, 0);
                 case RIGHT_DOWN:
-                    return new MapPosition(1, -1);
+                    return new MapPosition(1, 1);
                 case DOWN:
                     return new MapPosition(0, 1);
                 case LEFT_DOWN:
