@@ -15,4 +15,9 @@ public class Programmer extends Unit {
     public Programmer() {
         super(100, 30, 3);
     }
+
+    @Override
+    public boolean canMoveTo(MapPosition position) {
+        return true;
+    }
 }

@@ -47,7 +47,7 @@ public class GridCanvas extends Canvas {
         ctx = this.getGraphicsContext2D();
 
         this.setOnKeyPressed(this::onKeyPressed);
-        this.setOnMouseClicked(this::onMouseClick);
+        this.setOnMousePressed(this::onMouseClick);
     }
 
     public void drawIcon(CanvasIcon icon, Vector2D position) {
@@ -69,8 +69,9 @@ public class GridCanvas extends Canvas {
         double x = event.getX(), y = event.getY();
         MapPosition clickedHex = this.canvasXYToPosition(new Vector2D(x, y));
 
-        this.map.selectedPositions.clear();
-        this.map.selectedPositions.add(clickedHex);
+        if (event.isPrimaryButtonDown()) this.map.fieldLeftClicked(clickedHex);
+        else if (event.isSecondaryButtonDown()) this.map.fieldRightClicked(clickedHex);
+
         this.render();
     }
 
@@ -112,13 +113,13 @@ public class GridCanvas extends Canvas {
         this.drawGridLines(offset);
 
         // highlights
-        for (MapPosition position: this.map.selectedPositions) this.drawHexOutline(
-                position,
+        this.drawHexOutline(
+                map.getSelectedPosition(),
                 3,
                 Color.YELLOW,
                 Color.color(1, 1, 0, 0.2)
         );
-        for (MapPosition position: this.map.highlightedPositions) this.drawHexOutline(
+        for (MapPosition position: this.map.getHighlightedPositions()) this.drawHexOutline(
                 position,
                 2,
                 Color.PINK,
@@ -136,6 +137,7 @@ public class GridCanvas extends Canvas {
     }
 
     private void drawHexOutline(MapPosition position, int thickness, Color color, Color fill) {
+        if (position == null) return;
         Vector2D hexOrigin = this.positionToGridXY(position);
         this.ctx.beginPath();
         this.ctx.moveTo(hexOrigin.x + r / 2, hexOrigin.y);

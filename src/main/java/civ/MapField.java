@@ -18,7 +18,7 @@ public class MapField implements IMapField {
     }
 
     @Override
-    public void addUnit(Unit unit) {
+    public void setUnit(Unit unit) {
         this.unit = unit;
     }
 
