@@ -2,11 +2,12 @@ package civ;
 
 import javafx.scene.canvas.GraphicsContext;
 
-import java.util.Map;
+import java.util.LinkedList;
 
 public class MapField implements IMapField {
     private Terrain terrain;
     private MapPosition position;
+    private Unit unit;
 
     public MapField(
             MapPosition position,
@@ -17,13 +18,13 @@ public class MapField implements IMapField {
     }
 
     @Override
-    public void addUnit(IUnit unit) {
-
+    public void addUnit(Unit unit) {
+        this.unit = unit;
     }
 
     @Override
-    public IUnit getUnit() {
-        return null;
+    public Unit getUnit() {
+        return this.unit;
     }
 
     @Override

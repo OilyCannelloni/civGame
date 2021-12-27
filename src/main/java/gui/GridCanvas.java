@@ -4,8 +4,8 @@ import civ.*;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-
 
 public class GridCanvas extends Canvas {
     private static final double sqrt3 = 1.7320508;
@@ -45,9 +45,9 @@ public class GridCanvas extends Canvas {
         this.setFocusTraversable(true);
 
         ctx = this.getGraphicsContext2D();
+
         this.setOnKeyPressed(this::onKeyPressed);
-
-
+        this.setOnMouseClicked(this::onMouseClick);
     }
 
     public void drawIcon(CanvasIcon icon, Vector2D position) {
@@ -57,11 +57,22 @@ public class GridCanvas extends Canvas {
 
     public void drawField(IMapField field) {
         MapPosition mapPosition = field.getPosition();
-        Vector2D gridFieldOrigin = this.positionToGridXY(mapPosition, this.origin);
+        Vector2D gridFieldOrigin = this.positionToGridXY(mapPosition);
         assert field.getTerrain().getIcon() != null;
         this.drawIcon(field.getTerrain().getIcon(), gridFieldOrigin);
+        Unit unit = field.getUnit();
+        if (unit != null)
+            this.drawIcon(field.getUnit().getIcon(), gridFieldOrigin);
     }
 
+    private void onMouseClick(MouseEvent event) {
+        double x = event.getX(), y = event.getY();
+        MapPosition clickedHex = this.canvasXYToPosition(new Vector2D(x, y));
+
+        this.map.selectedPositions.clear();
+        this.map.selectedPositions.add(clickedHex);
+        this.render();
+    }
 
     private void onKeyPressed(KeyEvent keyEvent) {
         System.out.println(keyEvent.getCode());
@@ -83,7 +94,7 @@ public class GridCanvas extends Canvas {
                 delta = new Vector2D(0, 0);
         }
         this.origin = this.origin.add(delta).trimInside(mapRenderBoundingBox);
-        this.render(origin);
+        this.render();
     }
 
     public void init() {
@@ -94,12 +105,25 @@ public class GridCanvas extends Canvas {
         this.ctx.clearRect(0, 0, this.getWidth(), this.getHeight());
     }
 
-    public void render(Vector2D renderBaseXY) {
+    public void render() {
         this.clear();
         // grid lines
-        Vector2D offset = this.getGridOffset(renderBaseXY);
-        System.out.println(offset);
+        Vector2D offset = this.getGridOffset(this.origin);
         this.drawGridLines(offset);
+
+        // highlights
+        for (MapPosition position: this.map.selectedPositions) this.drawHexOutline(
+                position,
+                3,
+                Color.YELLOW,
+                Color.color(1, 1, 0, 0.2)
+        );
+        for (MapPosition position: this.map.highlightedPositions) this.drawHexOutline(
+                position,
+                2,
+                Color.PINK,
+                Color.color(1, 0xc0, 0xcb, 0.2)
+        );
 
         // fields
         MapRect renderedRect = this.getRenderedMapRect();
@@ -109,6 +133,24 @@ public class GridCanvas extends Canvas {
                 this.drawField(field);
             }
         }
+    }
+
+    private void drawHexOutline(MapPosition position, int thickness, Color color, Color fill) {
+        Vector2D hexOrigin = this.positionToGridXY(position);
+        this.ctx.beginPath();
+        this.ctx.moveTo(hexOrigin.x + r / 2, hexOrigin.y);
+        this.ctx.lineTo(hexOrigin.x + r * 3 / 2, hexOrigin.y);
+        this.ctx.lineTo(hexOrigin.x + 2*r, hexOrigin.y + r * sqrt3 / 2);
+        this.ctx.lineTo(hexOrigin.x + r * 3 / 2, hexOrigin.y + r * sqrt3);
+        this.ctx.lineTo(hexOrigin.x + r / 2, hexOrigin.y + r * sqrt3);
+        this.ctx.lineTo(hexOrigin.x, hexOrigin.y + r * sqrt3 / 2);
+        this.ctx.closePath();
+        this.ctx.setStroke(color);
+        this.ctx.setFill(fill);
+        this.ctx.setLineWidth(thickness);
+        this.ctx.stroke();
+        this.ctx.fill();
+        this.ctx.setFill(null);
     }
 
     private MapRect getRenderedMapRect() {
@@ -126,9 +168,41 @@ public class GridCanvas extends Canvas {
         ).opposite();
     }
 
-    public Vector2D positionToGridXY(MapPosition position, Vector2D renderBaseXY) {
+    public Vector2D positionToGridXY(MapPosition position) {
         Vector2D absolute = this.toAbsoluteGridXY(position);
-        return absolute.subtract(renderBaseXY);
+        return absolute.subtract(this.origin);
+    }
+
+    public MapPosition canvasXYToPosition(Vector2D gridXY) {
+        Vector2D absolute = gridXY.add(origin);
+        MapPosition strip = new MapPosition(
+                ((int) (absolute.x / (3 * r))) * 2,
+                (int) (absolute.y / (r * sqrt3))
+        );
+        MapPosition[] CHECKED_HEXES = {
+                strip,
+                strip.point(MapDirection.LEFT_UP),
+                strip.point(MapDirection.LEFT_DOWN),
+                strip.point(MapDirection.RIGHT_UP),
+                strip.point(MapDirection.RIGHT_DOWN)
+        };
+        for (MapPosition hex : CHECKED_HEXES) {
+            if (this.gridXYInHex(gridXY, hex)) return hex;
+        }
+        return new MapPosition(0, 0);
+    }
+
+    private boolean gridXYInHex(Vector2D gridXY, MapPosition hex) {
+        Vector2D hexOrigin = this.toAbsoluteGridXY(hex);
+        Vector2D relative = gridXY.subtract(hexOrigin);
+        if (relative.y < -sqrt3 * relative.x + r * sqrt3 / 2) return false;
+        if (relative.y < 0) return false;
+        if (relative.y < sqrt3 * relative.x - r * 3 / 2 * sqrt3) return false;
+        if (relative.y > -sqrt3 * relative.x + r * 5 / 2 * sqrt3) return false;
+        if (relative.y > r * sqrt3) return false;
+        //noinspection RedundantIfStatement
+        if (relative.y > sqrt3 * relative.x + r * sqrt3 / 2) return false;
+        return true;
     }
 
     private Vector2D toAbsoluteGridXY(MapPosition position) {

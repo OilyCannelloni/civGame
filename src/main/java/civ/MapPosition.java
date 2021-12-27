@@ -1,5 +1,6 @@
 package civ;
 
+import java.util.Map;
 import java.util.Objects;
 
 
@@ -51,20 +52,12 @@ public class MapPosition {
         return this.x == that.x && this.y == that.y;
     }
 
+    public MapPosition point(MapDirection dir) {
+        return this.add(dir.delta(this));
+    }
+
     public MapPosition opposite(){
         return new MapPosition(-this.x, -this.y);
-    }
-
-
-    public MapPosition multiplyEach(MapPosition other) {
-        return new MapPosition(this.x * other.x, this.y * other.y);
-    }
-
-    public MapPosition multiplyEach(int a) {
-        return new MapPosition(
-                this.x * a,
-                this.y * a
-        );
     }
 
     @Override

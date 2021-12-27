@@ -25,7 +25,7 @@ public class App extends Application {
         canvasVBox.getChildren().add(this.canvas);
 
         this.canvas.init();
-        this.canvas.render(new Vector2D(0, 0));
+        this.canvas.render();
 
         primaryStage.setScene(scene);
         primaryStage.show();

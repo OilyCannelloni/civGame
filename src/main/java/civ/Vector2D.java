@@ -55,6 +55,13 @@ public class Vector2D {
         return new Vector2D(-this.x, -this.y);
     }
 
+    public double angle() {
+        if (this.x == 0 && this.y > 0) return Double.MAX_VALUE;
+        if (this.x == 0 && this.y < 0) return Double.MIN_VALUE;
+        if (this.x == 0) return 0;
+        return this.y / this.x;
+    }
+
 
     public Vector2D multiplyEach(Vector2D other) {
         return new Vector2D(this.x * other.x, this.y * other.y);

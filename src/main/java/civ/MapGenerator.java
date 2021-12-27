@@ -1,5 +1,7 @@
 package civ;
 
+import gui.CanvasIcon;
+
 public class MapGenerator {
     public static WorldMap generateRandomMap(int width, int height) {
         WorldMap map = new WorldMap(width, height);
@@ -11,6 +13,11 @@ public class MapGenerator {
                 ));
             }
         }
+
+        map.placeUnit(new Programmer(), new MapPosition(3, 3));
+
+        CanvasIcon icon = map.getField(new MapPosition(3, 3)).getUnit().getIcon();
+
         return map;
     }
 }
