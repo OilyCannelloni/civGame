@@ -4,4 +4,5 @@ public interface IMapField {
     void addUnit(IUnit unit);
     IUnit getUnit();
     Terrain getTerrain();
+    MapPosition getPosition();
 }

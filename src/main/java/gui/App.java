@@ -27,12 +27,6 @@ public class App extends Application {
         this.canvas.init();
         this.canvas.render(new Vector2D(0, 0));
 
-        MapField field = new MapField(new MapPosition(3, 5), Terrain.PLAINS);
-        this.canvas.drawField(field);
-
-
-
-
         primaryStage.setScene(scene);
         primaryStage.show();
     }

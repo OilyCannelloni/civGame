@@ -46,4 +46,8 @@ public enum Terrain {
                 return PLAINS_IMG;
         }
     }
+
+    public static Terrain getRandom() {
+        return Terrain.values()[Algorithm.random.nextInt(Terrain.values().length)];
+    }
 }

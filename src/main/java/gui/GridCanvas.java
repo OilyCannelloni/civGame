@@ -1,9 +1,6 @@
 package gui;
 
-import civ.MapField;
-import civ.MapPosition;
-import civ.Rect2D;
-import civ.Vector2D;
+import civ.*;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyEvent;
@@ -22,11 +19,14 @@ public class GridCanvas extends Canvas {
     private final Color tileBorderColor = Color.ANTIQUEWHITE;
 
     private final Rect2D
-            mapRenderBoundingBox = new Rect2D(0, 0, 3000, 2000);
+            mapRenderBoundingBox,
+            canvasBoundingBox = new Rect2D(0, 0, this.getWidth(), this.getHeight());
 
     private Vector2D origin;
 
     public GraphicsContext ctx;
+
+    public WorldMap map;
 
     public GridCanvas(int x, int y) {
         super(x, y);
@@ -34,11 +34,20 @@ public class GridCanvas extends Canvas {
         this.setHeight(y);
         this.r = 50;
         this.origin = new Vector2D(0, 0);
+        this.map = MapGenerator.generateRandomMap(50, 50);
+        this.mapRenderBoundingBox = new Rect2D(
+                new Vector2D(0, 0),
+                this.toAbsoluteGridXY(this.map.getLowerRight())
+                        .subtract(new Vector2D(this.getWidth(), this.getHeight()))
+                        .add(new Vector2D(2*r, 2*r))
+        );
 
         this.setFocusTraversable(true);
 
         ctx = this.getGraphicsContext2D();
         this.setOnKeyPressed(this::onKeyPressed);
+
+
     }
 
     public void drawIcon(CanvasIcon icon, Vector2D position) {
@@ -46,7 +55,7 @@ public class GridCanvas extends Canvas {
         this.ctx.drawImage(icon, finalXY.x, finalXY.y);
     }
 
-    public void drawField(MapField field) {
+    public void drawField(IMapField field) {
         MapPosition mapPosition = field.getPosition();
         Vector2D gridFieldOrigin = this.positionToGridXY(mapPosition, this.origin);
         assert field.getTerrain().getIcon() != null;
@@ -87,10 +96,28 @@ public class GridCanvas extends Canvas {
 
     public void render(Vector2D renderBaseXY) {
         this.clear();
+        // grid lines
         Vector2D offset = this.getGridOffset(renderBaseXY);
         System.out.println(offset);
         this.drawGridLines(offset);
-    } 
+
+        // fields
+        MapRect renderedRect = this.getRenderedMapRect();
+        for (int x = renderedRect.upperLeft.x; x <= renderedRect.lowerRight.x; x++) {
+            for (int y = renderedRect.upperLeft.y; y <= renderedRect.lowerRight.y; y++) {
+                IMapField field = this.map.getField(new MapPosition(x, y));
+                this.drawField(field);
+            }
+        }
+    }
+
+    private MapRect getRenderedMapRect() {
+        int yMin = Math.max((int) (this.origin.y / (r * sqrt3)) - 1, 0);
+        int yMax = Math.min((int) ((this.origin.y + this.getHeight()) / (r * sqrt3)), this.map.getHeight() - 1);
+        int xMin = Math.max((int) (this.origin.x / (r * 3 / 2)) - 1, 0);
+        int xMax = Math.min((int) ((this.origin.x + this.getWidth())/ (r * 3 / 2)), this.map.getWidth() - 1);
+        return new MapRect(xMin, yMin, xMax, yMax);
+    }
     
     private Vector2D getGridOffset(Vector2D renderBaseXY) {
         return new Vector2D(
