@@ -61,8 +61,12 @@ public class GridCanvas extends Canvas {
         assert field.getTerrain().getIcon() != null;
         this.drawIcon(field.getTerrain().getIcon(), gridFieldOrigin);
         Unit unit = field.getUnit();
-        if (unit != null)
+        if (unit != null) {
             this.drawIcon(unit.getIcon(), gridFieldOrigin);
+            HPBar bar = new HPBar(unit.getHP(), unit.getMaxHP());
+            bar.draw(ctx, gridFieldOrigin);
+        }
+
     }
 
     private void onMouseClick(MouseEvent event) {

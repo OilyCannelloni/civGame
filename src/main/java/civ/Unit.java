@@ -1,6 +1,7 @@
 package civ;
 
 import gui.CanvasIcon;
+import javafx.scene.canvas.GraphicsContext;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -10,16 +11,17 @@ public abstract class Unit implements IMapElement {
     protected static String IMG_PATH = "file:.\\src\\main\\resources\\";
     protected static Vector2D UNIT_ICON_OFFSET = new Vector2D(28, 25);
 
-    private int HP, maxMove, attack, remainingMove;
+    private int HP, maxHP, maxMove, attack, remainingMove;
     private LinkedList<Terrain> impassableTerrain;
     protected WorldMap map;
     protected Player player;
     protected String name = "";
 
-    public Unit(WorldMap map, Player player, int hp, int attack, int maxMove) {
+    public Unit(WorldMap map, Player player, int hp, int maxHP, int attack, int maxMove) {
         this.map = map;
         this.player = player;
         this.HP = hp;
+        this.maxHP = maxHP;
         this.attack = attack;
         this.maxMove = maxMove;
         this.remainingMove = maxMove;
@@ -28,6 +30,14 @@ public abstract class Unit implements IMapElement {
 
     public Player getPlayer() {
         return this.player;
+    }
+
+    public int getHP() {
+        return HP;
+    }
+
+    public int getMaxHP() {
+        return maxHP;
     }
 
     public CanvasIcon getIcon() {

@@ -3,7 +3,7 @@ package civ;
 import gui.CanvasIcon;
 public class Programmer extends Unit {
     public Programmer(WorldMap map, Player player) {
-        super(map, player,100, 30, 3);
+        super(map, player,60, 100, 30, 3);
         this.name = "programmer";
     }
 
