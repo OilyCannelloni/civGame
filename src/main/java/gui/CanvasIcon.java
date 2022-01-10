@@ -3,6 +3,8 @@ package gui;
 import civ.Vector2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
+import javafx.scene.paint.Color;
 
 public class CanvasIcon extends Image {
     private Vector2D offset;

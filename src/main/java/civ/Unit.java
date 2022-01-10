@@ -3,17 +3,22 @@ package civ;
 import gui.CanvasIcon;
 
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.Map;
+
 
 public abstract class Unit implements IMapElement {
+    protected static String IMG_PATH = "file:.\\src\\main\\resources\\";
+    protected static Vector2D UNIT_ICON_OFFSET = new Vector2D(28, 25);
+
     private int HP, maxMove, attack, remainingMove;
     private LinkedList<Terrain> impassableTerrain;
     protected WorldMap map;
+    protected Player player;
+    protected String name = "";
 
-    public Unit(WorldMap map, int hp, int attack, int maxMove) {
+    public Unit(WorldMap map, Player player, int hp, int attack, int maxMove) {
         this.map = map;
+        this.player = player;
         this.HP = hp;
         this.attack = attack;
         this.maxMove = maxMove;
@@ -21,8 +26,12 @@ public abstract class Unit implements IMapElement {
         this.impassableTerrain = new LinkedList<>();
     }
 
+    public Player getPlayer() {
+        return this.player;
+    }
+
     public CanvasIcon getIcon() {
-        return null;
+        return new CanvasIcon(IMG_PATH + this.name + "_" + this.player.color + ".png", UNIT_ICON_OFFSET);
     }
 
     public int getMovementCost(Terrain terrain) {

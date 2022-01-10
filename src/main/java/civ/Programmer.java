@@ -1,19 +1,10 @@
 package civ;
 
 import gui.CanvasIcon;
-
 public class Programmer extends Unit {
-    static CanvasIcon ICON = new CanvasIcon(
-            "file:.\\src\\main\\resources\\programmer.png",
-            new Vector2D(28, 25)
-    );
-
-    public CanvasIcon getIcon() {
-        return ICON;
-    }
-
-    public Programmer(WorldMap map) {
-        super(map,100, 30, 3);
+    public Programmer(WorldMap map, Player player) {
+        super(map, player,100, 30, 3);
+        this.name = "programmer";
     }
 
     @Override

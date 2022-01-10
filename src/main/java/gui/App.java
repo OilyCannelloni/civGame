@@ -1,9 +1,5 @@
 package gui;
 
-import civ.MapField;
-import civ.MapPosition;
-import civ.Terrain;
-import civ.Vector2D;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;

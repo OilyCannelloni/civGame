@@ -62,7 +62,7 @@ public class GridCanvas extends Canvas {
         this.drawIcon(field.getTerrain().getIcon(), gridFieldOrigin);
         Unit unit = field.getUnit();
         if (unit != null)
-            this.drawIcon(field.getUnit().getIcon(), gridFieldOrigin);
+            this.drawIcon(unit.getIcon(), gridFieldOrigin);
     }
 
     private void onMouseClick(MouseEvent event) {
