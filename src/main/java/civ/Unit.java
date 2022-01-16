@@ -3,7 +3,9 @@ package civ;
 import gui.CanvasIcon;
 import javafx.scene.canvas.GraphicsContext;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
 
@@ -16,8 +18,9 @@ public abstract class Unit implements IMapElement {
     protected WorldMap map;
     protected Player player;
     protected String name = "";
+    protected MapPosition position;
 
-    public Unit(WorldMap map, Player player, int hp, int maxHP, int attack, int maxMove) {
+    public Unit(WorldMap map, Player player, MapPosition position, int hp, int maxHP, int attack, int maxMove) {
         this.map = map;
         this.player = player;
         this.HP = hp;
@@ -26,6 +29,11 @@ public abstract class Unit implements IMapElement {
         this.maxMove = maxMove;
         this.remainingMove = maxMove;
         this.impassableTerrain = new LinkedList<>();
+        this.position = position;
+    }
+
+    public MapPosition getPosition() {
+        return this.position;
     }
 
     public Player getPlayer() {
@@ -59,10 +67,38 @@ public abstract class Unit implements IMapElement {
     }
 
     public boolean canMoveTo(MapPosition position) {
-        return this.map.isWithinBounds(position);
+        if (!map.isWithinBounds(position)) return false;
+        Unit unit = map.getField(position).getUnit();
+        return unit == null;
     }
 
-    public LinkedHashMap<MapPosition, Integer> getPossibleMoves(MapPosition position) {
+    public boolean canAttackTo(MapPosition position) {
+        if (!map.isWithinBounds(position)) return false;
+        Collection<MapPosition> adjacent = this.position.adjacent();
+        if (!adjacent.contains(position)) return false;
+        Unit target = map.getField(position).getUnit();
+        if (target == null) return false;
+        if (target.getPlayer().getColor() != this.getPlayer().getColor()) {
+            System.out.println("can attack");
+            return true;
+        }
+        return false;
+    }
+
+    public LinkedHashSet<MapPosition> getPossibleAttacks() {
+        LinkedHashSet<MapPosition> ret = new LinkedHashSet<>();
+
+        Collection<MapPosition> adjacent = this.position.adjacent();
+        for (MapPosition position : adjacent) {
+            Unit unit = this.map.getField(position).getUnit();
+            if (unit != null && unit.getPlayer() != this.player) {
+                ret.add(position);
+            }
+        }
+        return ret;
+    }
+
+    public LinkedHashMap<MapPosition, Integer> getPossibleMoves() {
         LinkedHashMap<MapPosition, Integer> possibleMoves = new LinkedHashMap<>();
 
         int m = this.remainingMove;
@@ -73,13 +109,10 @@ public abstract class Unit implements IMapElement {
 
         do {
             LinkedHashMap<MapPosition, Integer> newMoves = new LinkedHashMap<>();
-
             for (MapPosition reached : oldNewMoves.keySet()) {
-
                 for (MapPosition adjacent : reached.adjacent()) {
                     if (this.canMoveTo(adjacent)) {
                         int moveInCost = this.getMovementCost(this.map.getField(adjacent).getTerrain());
-
                         if (!possibleMoves.containsKey(adjacent)) {
                             int costAfterMove = possibleMoves.get(reached) - moveInCost;
                             possibleMoves.put(adjacent, costAfterMove);
@@ -101,5 +134,9 @@ public abstract class Unit implements IMapElement {
         } while (!oldNewMoves.isEmpty());
 
         return possibleMoves;
+    }
+
+    public void moveHappened(MapPosition pos1, MapPosition pos2) {
+        this.position = pos2;
     }
 }

@@ -10,4 +10,8 @@ public class Player {
         this.color = color;
         this.priority = priority;
     }
+
+    public PlayerColor getColor() {
+        return this.color;
+    }
 }

@@ -2,9 +2,7 @@ package civ;
 
 import gui.CanvasIcon;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.SVGPath;
 
 public enum Terrain {
     PLAINS,
@@ -14,7 +12,7 @@ public enum Terrain {
 
     CanvasIcon PLAINS_IMG = new CanvasIcon("file:.\\src\\main\\resources\\plains.png", new Vector2D(25, 65));
     CanvasIcon HILLS_IMG = new CanvasIcon("file:.\\src\\main\\resources\\hills.png", new Vector2D(28, 65));
-    CanvasIcon MOUNTAINS_IMG = new CanvasIcon("file:.\\src\\main\\resources\\mountains.png", new Vector2D(25, 65));
+    CanvasIcon MOUNTAINS_IMG = new CanvasIcon("file:.\\src\\main\\resources\\mountains.png", new Vector2D(25, 54));
     CanvasIcon WATER_IMG = new CanvasIcon("file:.\\src\\main\\resources\\water.png", new Vector2D(25, 65));
 
 

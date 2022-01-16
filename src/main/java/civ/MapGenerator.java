@@ -15,8 +15,8 @@ public class MapGenerator {
         Player blue = new Player(PlayerColor.BLUE, 0);
         Player red = new Player(PlayerColor.GREEN, 0);
 
-        map.placeUnit(new Programmer(map, blue), new MapPosition(3, 3));
-        map.placeUnit(new Programmer(map, red), new MapPosition(6, 5));
+        map.placeUnit(new Programmer(map, blue, new MapPosition(3, 3)));
+        map.placeUnit(new Programmer(map, red, new MapPosition(6, 5)));
 
         return map;
     }

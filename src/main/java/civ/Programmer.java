@@ -1,9 +1,8 @@
 package civ;
 
-import gui.CanvasIcon;
 public class Programmer extends Unit {
-    public Programmer(WorldMap map, Player player) {
-        super(map, player,60, 100, 30, 3);
+    public Programmer(WorldMap map, Player player, MapPosition position) {
+        super(map, player, position, 30, 100, 3, 3);
         this.name = "programmer";
     }
 

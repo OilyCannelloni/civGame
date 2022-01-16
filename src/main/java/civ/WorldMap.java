@@ -46,7 +46,8 @@ public class WorldMap {
         this.fields[position.x][position.y] = field;
     }
 
-    public void placeUnit(Unit unit, MapPosition position) {
+    public void placeUnit(Unit unit) {
+        MapPosition position = unit.getPosition();
         this.fields[position.x][position.y].setUnit(unit);
     }
 
@@ -63,8 +64,11 @@ public class WorldMap {
         this.highlightedPositions.clear();
 
         Unit unit = this.getField(position).getUnit();
-        if (unit != null)
-            this.highlightedPositions.addAll(unit.getPossibleMoves(position).keySet());
+        if (unit != null) {
+            this.highlightedPositions.addAll(unit.getPossibleMoves().keySet());
+            this.highlightedPositions.addAll(unit.getPossibleAttacks());
+        }
+
     }
 
     public void fieldRightClicked(MapPosition position) {
@@ -77,9 +81,14 @@ public class WorldMap {
         }
     }
 
+    private void attack(MapPosition pos1, MapPosition pos2) {
+
+    }
+
     private void move(MapPosition pos1, MapPosition pos2) {
         Unit unit = this.getField(pos1).getUnit();
         this.getField(pos1).setUnit(null);
         this.getField(pos2).setUnit(unit);
+        unit.moveHappened(pos1, pos2);
     }
 }
