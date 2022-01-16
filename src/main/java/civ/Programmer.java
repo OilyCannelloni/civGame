@@ -2,7 +2,7 @@ package civ;
 
 public class Programmer extends Unit {
     public Programmer(WorldMap map, Player player, MapPosition position) {
-        super(map, player, position, 30, 100, 3, 3);
+        super(map, player, position, 100, 100, 20, 3);
         this.name = "programmer";
     }
 

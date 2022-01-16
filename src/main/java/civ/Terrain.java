@@ -48,4 +48,24 @@ public enum Terrain {
     public static Terrain getRandom() {
         return Terrain.values()[Algorithm.random.nextInt(Terrain.values().length)];
     }
+
+    public double getAttackModifier() {
+        switch (this) {
+            case WATER: return 0.9;
+            case MOUNTAINS: return 0;
+            case HILLS: return 1.1;
+            case PLAINS: return 1;
+            default: return 1;
+        }
+    }
+
+    public double getDefenceModifier() {
+        switch (this) {
+            case WATER: return 0.5;
+            case MOUNTAINS: return 2;
+            case HILLS: return 1.3;
+            case PLAINS: return 1;
+            default: return 1;
+        }
+    }
 }

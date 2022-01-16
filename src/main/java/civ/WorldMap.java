@@ -1,5 +1,6 @@
 package civ;
 
+import java.lang.reflect.Field;
 import java.util.LinkedList;
 
 public class WorldMap {
@@ -77,12 +78,50 @@ public class WorldMap {
             if (selectedUnit.canMoveTo(position)) {
                 this.move(selectedPosition, position);
                 this.fieldLeftClicked(position);
+            } else if (selectedUnit.canAttackTo(position)) {
+                this.attack(selectedPosition, position);
+                this.fieldLeftClicked(selectedUnit.getPosition());
             }
         }
     }
 
     private void attack(MapPosition pos1, MapPosition pos2) {
+        MapField attackerField = this.getField(pos1), defenderField = this.getField(pos2);
+        Unit attacker = this.getField(pos1).getUnit(), defender = this.getField(pos2).getUnit();
 
+        System.out.println("--- FIGHT ---");
+        System.out.println("att HP: " + attacker.getHP() + "  def HP: " + defender.getHP());
+
+        int newAttackerHP = (int) (attacker.getHP() -
+                defender.getAttack() * defenderField.getTerrain().getDefenceModifier());
+        int newDefenderHP = (int) (defender.getHP() -
+                attacker.getAttack() * defenderField.getTerrain().getAttackModifier());
+
+        System.out.println("att new HP: " + newAttackerHP + "  def new HP: " + newDefenderHP);
+
+        if (newAttackerHP > 0 && newDefenderHP > 0) {
+            attacker.setHP(newAttackerHP);
+            defender.setHP(newDefenderHP);
+            attacker.afterAttack();
+        } else if (newAttackerHP > 0) {
+            attacker.setHP(newAttackerHP);
+            defender.onDeath(attacker);
+            defenderField.setUnit(null);
+            move(pos1, pos2);
+        } else if (newDefenderHP > 0) {
+            defender.setHP(newDefenderHP);
+            attacker.onDeath(defender);
+            attackerField.setUnit(null);
+        } else if (newAttackerHP > newDefenderHP) {
+            attacker.setHP(1);
+            defender.onDeath(attacker);
+            defenderField.setUnit(null);
+            move(pos1, pos2);
+        } else {
+            defender.setHP(1);
+            attacker.onDeath(defender);
+            attackerField.setUnit(null);
+        }
     }
 
     private void move(MapPosition pos1, MapPosition pos2) {

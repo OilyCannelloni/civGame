@@ -44,6 +44,26 @@ public abstract class Unit implements IMapElement {
         return HP;
     }
 
+    public void setHP(int HP) {
+        this.HP = HP;
+    }
+
+    public int getAttack() {
+        return this.attack;
+    }
+
+    public void afterAttack() {
+        // this.remainingMove = 0;
+    }
+
+    public void afterDefence() {
+
+    }
+
+    public void onDeath(Unit killer) {
+        System.out.println(this.name + " has been killed by " + killer.name);
+    }
+
     public int getMaxHP() {
         return maxHP;
     }
