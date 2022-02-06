@@ -14,7 +14,7 @@ public class GridCanvas extends Canvas {
             tileBorderLineWidth = 3;
 
     private final double
-            moveDistance = 30;
+            moveDistance = 15;
 
     private final Color tileBorderColor = Color.ANTIQUEWHITE;
 
@@ -82,16 +82,16 @@ public class GridCanvas extends Canvas {
     private void onKeyPressed(KeyEvent keyEvent) {
         Vector2D delta;
         switch (keyEvent.getCode()) {
-            case DOWN:
+            case S:
                 delta = new Vector2D(0, moveDistance);
                 break;
-            case LEFT:
+            case A:
                 delta = new Vector2D(-moveDistance, 0);
                 break;
-            case UP:
+            case W:
                 delta = new Vector2D(0, -moveDistance);
                 break;
-            case RIGHT:
+            case D:
                 delta = new Vector2D(moveDistance, 0);
                 break;
             default:

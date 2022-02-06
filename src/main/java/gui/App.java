@@ -1,5 +1,6 @@
 package gui;
 
+import civ.MapGenerator;
 import civ.Player;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -18,11 +19,13 @@ public class App extends Application {
         System.out.println("start");
 
         VBox mainVBox = new VBox();
-        Scene scene = new Scene(mainVBox, 1500, 1200, new Color(0.5, 0.1, 0.1, 1));
+        Scene scene = new Scene(mainVBox, 1600, 1000, new Color(0.5, 0.1, 0.1, 1));
 
         HBox canvasHBox = new HBox();
-        this.canvas = new GridCanvas(1500, 1000);
+        this.canvas = new GridCanvas(1600, 800);
         canvasHBox.getChildren().add(this.canvas);
+        scene.setOnKeyPressed(keyEvent -> this.canvas.requestFocus());
+
 
         mainVBox.getChildren().add(canvasHBox);
 
@@ -38,6 +41,10 @@ public class App extends Application {
         opt1.getChildren().add(actionButton);
 
         MenuButton newGameButton = new MenuButton("New Game");
+        newGameButton.setOnAction(actionEvent -> {
+            this.canvas.map = MapGenerator.generateRandomMap(30, 30);
+            this.canvas.render();
+        });
         opt2.getChildren().add(newGameButton);
 
         MenuButton endTurnButton = new MenuButton("End Turn");
@@ -45,6 +52,7 @@ public class App extends Application {
             Player p = this.canvas.map.nextTurn();
             System.out.println("Player " + p.getColor() + "'s turn");
             this.canvas.render();
+            endTurnButton.setStyle(String.format("-fx-background-color: %s;", p.getColor()));
         });
         opt3.getChildren().add(endTurnButton);
 

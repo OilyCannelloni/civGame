@@ -12,6 +12,12 @@ public class MapPosition {
         this.y = y;
     }
 
+    public static MapPosition randomIn(MapPosition upperLeft, MapPosition lowerRight) {
+        int x = upperLeft.x + Algorithm.random.nextInt(lowerRight.x - upperLeft.x);
+        int y = upperLeft.y + Algorithm.random.nextInt(lowerRight.y - upperLeft.y);
+        return new MapPosition(x, y);
+    }
+
     public String toString(){
         return String.format("(%d,%d)", this.x, this.y);
     }

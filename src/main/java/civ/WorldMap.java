@@ -92,6 +92,18 @@ public class WorldMap {
         return null;
     }
 
+    public MapPosition getRandomEmptyField(MapPosition upperLeft, MapPosition lowerRight) {
+        int i = 100;
+        while (i-- > 0) {
+            MapPosition position = MapPosition.randomIn(upperLeft, lowerRight);
+            if (this.getField(position).getUnit() == null) {
+                return position;
+            }
+        }
+        return null;
+    }
+
+
     public void fieldLeftClicked(MapPosition position) {
         this.selectedPosition = position;
         this.highlightedPositions.clear();
