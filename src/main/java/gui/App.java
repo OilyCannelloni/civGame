@@ -1,11 +1,12 @@
 package gui;
 
-import civ.MapGenerator;
-import civ.Player;
+import civ.*;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
+import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -38,13 +39,23 @@ public class App extends Application {
         optionsBox.getChildren().addAll(opt1, opt2, opt3);
 
         MenuButton actionButton = new MenuButton("Execute Action");
+        actionButton.setOnAction(actionEvent -> {
+            MapPosition position = this.canvas.map.getSelectedPosition();
+            Unit unit = this.canvas.map.getField(position).getUnit();
+            if (unit != null) {
+                unit.action();
+            }
+            this.canvas.render();
+        });
         opt1.getChildren().add(actionButton);
 
         MenuButton newGameButton = new MenuButton("New Game");
         newGameButton.setOnAction(actionEvent -> {
             this.canvas.map = MapGenerator.generateRandomMap(30, 30);
             this.canvas.render();
+            this.canvas.ctx.drawImage(new Image("file:.\\src\\main\\resources\\instructions.png"), 0, 0);
         });
+
         opt2.getChildren().add(newGameButton);
 
         MenuButton endTurnButton = new MenuButton("End Turn");
@@ -54,10 +65,11 @@ public class App extends Application {
             this.canvas.render();
             endTurnButton.setStyle(String.format("-fx-background-color: %s;", p.getColor()));
         });
+        endTurnButton.setStyle(String.format("-fx-background-color: %s;", this.canvas.map.playerAtTurn.getColor()));
         opt3.getChildren().add(endTurnButton);
 
         this.canvas.init();
-        this.canvas.render();
+        newGameButton.getOnAction().handle(new ActionEvent());
 
         primaryStage.setScene(scene);
         primaryStage.show();

@@ -12,7 +12,7 @@ public class WorldMap {
     private MapPosition selectedPosition;
     private MapRect boundingBox;
     private LinkedList<Player> players;
-    private Player playerAtTurn;
+    public Player playerAtTurn;
 
     public WorldMap(int width, int height) {
         this.width = width;

@@ -31,11 +31,34 @@ public class MapGenerator {
             MapPosition position = map.getRandomEmptyField(new MapPosition(3, 3), new MapPosition(6, 10));
             map.placeUnit(new Programmer(map, blue, position));
         }
+        for (int i = 0; i < 2; i++) {
+            MapPosition position = map.getRandomEmptyField(new MapPosition(3, 3), new MapPosition(6, 10));
+            map.placeUnit(new Daredevil(map, blue, position));
+        }
+        for (int i = 0; i < 1; i++) {
+            MapPosition position = map.getRandomEmptyField(new MapPosition(3, 3), new MapPosition(6, 10));
+            map.placeUnit(new MafiaBoss(map, blue, position));
+        }
+
+
+
+
 
         for (int i = 0; i < 6; i++) {
             MapPosition position = map.getRandomEmptyField(new MapPosition(10, 3), new MapPosition(13, 10));
             map.placeUnit(new Programmer(map, red, position));
         }
+        for (int i = 0; i < 2; i++) {
+            MapPosition position = map.getRandomEmptyField(new MapPosition(10, 3), new MapPosition(13, 10));
+            map.placeUnit(new Daredevil(map, red, position));
+        }
+        for (int i = 0; i < 2; i++) {
+            MapPosition position = map.getRandomEmptyField(new MapPosition(10, 3), new MapPosition(13, 10));
+            map.placeUnit(new MafiaBoss(map, red, position));
+        }
+
+
+
 
         try {
             map.initiateGame();

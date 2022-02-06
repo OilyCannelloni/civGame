@@ -18,6 +18,7 @@ public abstract class Unit implements IMapElement {
     protected Player player;
     protected String name = "";
     protected MapPosition position;
+    protected boolean actionUsed;
 
     public Unit(WorldMap map, Player player, MapPosition position, int hp, int maxHP, int attack, int maxMove) {
         this.map = map;
@@ -30,11 +31,26 @@ public abstract class Unit implements IMapElement {
         this.impassableTerrain = new LinkedList<>();
         this.position = position;
         this.player.addUnit(this);
+        this.actionUsed = false;
+    }
+
+    public void action() {
+        this.actionUsed = true;
+    }
+
+    public void damage(Unit unit, int damage) {
+        this.HP -= damage;
+        if (this.HP < 0) this.onDeath(unit);
+    }
+
+    public void heal(int amount) {
+        this.HP = Math.min(this.maxHP, this.HP + amount);
     }
 
     public void refresh() {
         if (this.remainingMove > 0) this.HP = Math.min(this.HP + 10, this.maxHP);
         this.remainingMove = this.maxMove;
+        this.actionUsed = false;
     }
 
     public MapPosition getPosition() {
@@ -68,6 +84,7 @@ public abstract class Unit implements IMapElement {
     public void onDeath(Unit killer) {
         System.out.println(this.name + " has been killed by " + killer.name);
         this.player.removeUnit(this);
+        this.map.getField(this.position).setUnit(null);
     }
 
     public int getMaxHP() {
