@@ -102,7 +102,8 @@ public class GridCanvas extends Canvas {
     }
 
     public void init() {
-        ctx.setFill(Color.DARKGREY);
+        ctx.setFill(new Color(0.1, 0.1, 0.1, 1));
+        ctx.fillRect(0, 0, this.canvasBoundingBox.lowerRight.x, this.canvasBoundingBox.lowerRight.y);
     }
 
     private void clear() {
@@ -111,6 +112,7 @@ public class GridCanvas extends Canvas {
 
     public void render() {
         this.clear();
+        this.init();
         // grid lines
         Vector2D offset = this.getGridOffset(this.origin);
         this.drawGridLines(offset);

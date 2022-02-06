@@ -1,7 +1,6 @@
 package civ;
 
 import gui.CanvasIcon;
-import javafx.scene.canvas.GraphicsContext;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -30,6 +29,12 @@ public abstract class Unit implements IMapElement {
         this.remainingMove = maxMove;
         this.impassableTerrain = new LinkedList<>();
         this.position = position;
+        this.player.addUnit(this);
+    }
+
+    public void refresh() {
+        if (this.remainingMove > 0) this.HP = Math.min(this.HP + 10, this.maxHP);
+        this.remainingMove = this.maxMove;
     }
 
     public MapPosition getPosition() {
@@ -53,7 +58,7 @@ public abstract class Unit implements IMapElement {
     }
 
     public void afterAttack() {
-        // this.remainingMove = 0;
+         this.remainingMove = 0;
     }
 
     public void afterDefence() {
@@ -62,6 +67,7 @@ public abstract class Unit implements IMapElement {
 
     public void onDeath(Unit killer) {
         System.out.println(this.name + " has been killed by " + killer.name);
+        this.player.removeUnit(this);
     }
 
     public int getMaxHP() {
@@ -87,26 +93,25 @@ public abstract class Unit implements IMapElement {
     }
 
     public boolean canMoveTo(MapPosition position) {
-        if (!map.isWithinBounds(position)) return false;
+        if (map.isOutsideBounds(position)) return false;
         Unit unit = map.getField(position).getUnit();
         return unit == null;
     }
 
     public boolean canAttackTo(MapPosition position) {
-        if (!map.isWithinBounds(position)) return false;
+        if (map.isOutsideBounds(position)) return false;
+        if (this.remainingMove <= 0) return false;
         Collection<MapPosition> adjacent = this.position.adjacent();
         if (!adjacent.contains(position)) return false;
         Unit target = map.getField(position).getUnit();
         if (target == null) return false;
-        if (target.getPlayer().getColor() != this.getPlayer().getColor()) {
-            System.out.println("can attack");
-            return true;
-        }
-        return false;
+        return target.getPlayer().getColor() != this.getPlayer().getColor();
     }
 
     public LinkedHashSet<MapPosition> getPossibleAttacks() {
         LinkedHashSet<MapPosition> ret = new LinkedHashSet<>();
+
+        if (this.remainingMove <= 0) return ret;
 
         Collection<MapPosition> adjacent = this.position.adjacent();
         for (MapPosition position : adjacent) {
@@ -123,6 +128,8 @@ public abstract class Unit implements IMapElement {
 
         int m = this.remainingMove;
         possibleMoves.put(position, m);
+
+        if (m <= 0) return possibleMoves;
 
         LinkedHashMap<MapPosition, Integer> oldNewMoves = new LinkedHashMap<>();
         oldNewMoves.put(position, m);
@@ -156,7 +163,8 @@ public abstract class Unit implements IMapElement {
         return possibleMoves;
     }
 
-    public void moveHappened(MapPosition pos1, MapPosition pos2) {
+    public void moveHappened(MapPosition pos1, MapPosition pos2, int remainingMove) {
         this.position = pos2;
+        this.remainingMove = Math.max(remainingMove, -1);
     }
 }

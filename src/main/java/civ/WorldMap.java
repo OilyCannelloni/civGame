@@ -1,7 +1,9 @@
 package civ;
 
-import java.lang.reflect.Field;
+import java.security.InvalidParameterException;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.ListIterator;
 
 public class WorldMap {
     private int width, height;
@@ -9,6 +11,8 @@ public class WorldMap {
     private LinkedList<MapPosition> highlightedPositions;
     private MapPosition selectedPosition;
     private MapRect boundingBox;
+    private LinkedList<Player> players;
+    private Player playerAtTurn;
 
     public WorldMap(int width, int height) {
         this.width = width;
@@ -17,10 +21,38 @@ public class WorldMap {
         this.selectedPosition = null;
         this.highlightedPositions = new LinkedList<>();
         this.boundingBox = new MapRect(0, 0, width - 1, height - 1);
+        this.players = new LinkedList<>();
     }
 
-    public boolean isWithinBounds(MapPosition position) {
-        return this.boundingBox.contains(position);
+    public Player nextTurn() {
+        playerAtTurn.refreshUnits();
+        ListIterator<Player> playerIterator = this.players.listIterator();
+        while (playerIterator.next() != playerAtTurn);
+        if (playerIterator.hasNext()) {
+            this.playerAtTurn = playerIterator.next();
+        } else {
+            this.playerAtTurn = this.players.getFirst();
+        }
+        return this.playerAtTurn;
+    }
+
+    public void initiateGame() {
+        this.playerAtTurn = players.getFirst();
+        if (this.playerAtTurn == null) throw new InvalidParameterException("There are no players defined!");
+        System.out.println("Game initiated");
+        System.out.println("Player " + playerAtTurn.getColor() + "'s turn");
+    }
+
+    public void addPlayer(Player player) {
+        this.players.add(player);
+    }
+
+    public void removePlayer(Player player) {
+        this.players.remove(player);
+    }
+
+    public boolean isOutsideBounds(MapPosition position) {
+        return !this.boundingBox.contains(position);
     }
 
     public LinkedList<MapPosition> getHighlightedPositions() {
@@ -65,18 +97,18 @@ public class WorldMap {
         this.highlightedPositions.clear();
 
         Unit unit = this.getField(position).getUnit();
-        if (unit != null) {
+        if (unit != null && unit.getPlayer() == this.playerAtTurn) {
             this.highlightedPositions.addAll(unit.getPossibleMoves().keySet());
             this.highlightedPositions.addAll(unit.getPossibleAttacks());
         }
-
     }
 
     public void fieldRightClicked(MapPosition position) {
         Unit selectedUnit = this.getField(selectedPosition).getUnit();
         if (selectedUnit != null) {
-            if (selectedUnit.canMoveTo(position)) {
-                this.move(selectedPosition, position);
+            HashMap<MapPosition, Integer> unitPossibleMoves = selectedUnit.getPossibleMoves();
+            if (selectedUnit.canMoveTo(position) && unitPossibleMoves.containsKey(position)) {
+                this.move(selectedPosition, position, unitPossibleMoves.get(position));
                 this.fieldLeftClicked(position);
             } else if (selectedUnit.canAttackTo(position)) {
                 this.attack(selectedPosition, position);
@@ -89,15 +121,11 @@ public class WorldMap {
         MapField attackerField = this.getField(pos1), defenderField = this.getField(pos2);
         Unit attacker = this.getField(pos1).getUnit(), defender = this.getField(pos2).getUnit();
 
-        System.out.println("--- FIGHT ---");
-        System.out.println("att HP: " + attacker.getHP() + "  def HP: " + defender.getHP());
 
         int newAttackerHP = (int) (attacker.getHP() -
                 defender.getAttack() * defenderField.getTerrain().getDefenceModifier());
         int newDefenderHP = (int) (defender.getHP() -
                 attacker.getAttack() * defenderField.getTerrain().getAttackModifier());
-
-        System.out.println("att new HP: " + newAttackerHP + "  def new HP: " + newDefenderHP);
 
         if (newAttackerHP > 0 && newDefenderHP > 0) {
             attacker.setHP(newAttackerHP);
@@ -108,19 +136,23 @@ public class WorldMap {
             defender.onDeath(attacker);
             defenderField.setUnit(null);
             move(pos1, pos2);
+            attacker.afterAttack();
         } else if (newDefenderHP > 0) {
             defender.setHP(newDefenderHP);
             attacker.onDeath(defender);
             attackerField.setUnit(null);
+            defender.afterDefence();
         } else if (newAttackerHP > newDefenderHP) {
             attacker.setHP(1);
             defender.onDeath(attacker);
             defenderField.setUnit(null);
             move(pos1, pos2);
+            attacker.afterAttack();
         } else {
             defender.setHP(1);
             attacker.onDeath(defender);
             attackerField.setUnit(null);
+            defender.afterDefence();
         }
     }
 
@@ -128,6 +160,13 @@ public class WorldMap {
         Unit unit = this.getField(pos1).getUnit();
         this.getField(pos1).setUnit(null);
         this.getField(pos2).setUnit(unit);
-        unit.moveHappened(pos1, pos2);
+        unit.moveHappened(pos1, pos2, 1000);
+    }
+
+    private void move(MapPosition pos1, MapPosition pos2, int cost) {
+        Unit unit = this.getField(pos1).getUnit();
+        this.getField(pos1).setUnit(null);
+        this.getField(pos2).setUnit(unit);
+        unit.moveHappened(pos1, pos2, cost);
     }
 }

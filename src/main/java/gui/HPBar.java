@@ -20,7 +20,6 @@ public class HPBar {
         ctx.moveTo(barOrigin.x, barOrigin.y);
 
         float HPPercentage = (float) HP / maxHP;
-        System.out.println(HPPercentage);
 
         if (HPPercentage < 0.3) ctx.setStroke(Color.RED);
         else if (HPPercentage < 0.7) ctx.setStroke(Color.YELLOW);
